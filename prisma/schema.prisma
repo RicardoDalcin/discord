@@ -55,6 +55,9 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  friends       Friend[]
+  servers       Server[]
+  messages      Message[]
 }
 
 model VerificationToken {
@@ -63,4 +66,44 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Friend {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  friend    User     @relation(fields: [friendId], references: [id], onDelete: Cascade)
+  friendId  String
+}
+
+model Server {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  name      String
+  owner     User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId   String
+  channels  Channel[]
+}
+
+model Channel {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  name      String
+  server    Server    @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  serverId  String
+  messages  Message[]
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  content   String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
+  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  channelId String
 }
