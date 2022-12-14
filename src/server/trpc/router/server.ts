@@ -1,12 +1,12 @@
 import { z } from "zod";
 
-import { router, publicProcedure } from "../trpc";
+import { router, protectedProcedure } from "../trpc";
 
 export const serverRouter = router({
-  getAll: publicProcedure.query(({ ctx }) => {
+  getAll: protectedProcedure.query(({ ctx }) => {
     return ctx.prisma.server.findMany();
   }),
-  create: publicProcedure
+  create: protectedProcedure
     .input(z.object({ name: z.string() }))
     .mutation(({ ctx, input }) => {
       return ctx.prisma.server.create({
@@ -25,7 +25,7 @@ export const serverRouter = router({
         },
       });
     }),
-  show: publicProcedure
+  show: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(({ ctx, input }) => {
       return ctx.prisma.server.findUnique({
@@ -37,7 +37,7 @@ export const serverRouter = router({
         },
       });
     }),
-  createChannel: publicProcedure
+  createChannel: protectedProcedure
     .input(z.object({ name: z.string(), serverId: z.string() }))
     .mutation(({ ctx, input }) => {
       return ctx.prisma.channel.create({
@@ -51,7 +51,7 @@ export const serverRouter = router({
         },
       });
     }),
-  getChannel: publicProcedure
+  getChannel: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(({ ctx, input }) => {
       return ctx.prisma.channel.findUnique({
@@ -59,11 +59,15 @@ export const serverRouter = router({
           id: input.id,
         },
         include: {
-          messages: true,
+          messages: {
+            include: {
+              author: true,
+            },
+          },
         },
       });
     }),
-  createMessage: publicProcedure
+  createMessage: protectedProcedure
     .input(
       z.object({
         content: z.string(),
@@ -84,6 +88,15 @@ export const serverRouter = router({
               id: ctx.session?.user?.id,
             },
           },
+        },
+      });
+    }),
+  deleteChannel: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(({ ctx, input }) => {
+      return ctx.prisma.channel.delete({
+        where: {
+          id: input.id,
         },
       });
     }),
