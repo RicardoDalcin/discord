@@ -13,6 +13,7 @@ import { trpc } from "../../utils/trpc";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import { formatDistanceToNow } from "date-fns";
+import Servers from "../../components/Servers";
 
 const Server: NextPage = () => {
   const [activeChannel, setActiveChannel] = useState<string>("");
@@ -102,7 +103,9 @@ const Server: NextPage = () => {
       </Head>
       <main className="flex max-h-screen min-h-screen overflow-y-auto overflow-x-hidden bg-gradient-to-b from-[#2e026d] to-[#15162c]">
         <div className="flex min-h-full w-full items-stretch justify-start">
-          <div className="flex h-full w-96 flex-col justify-between bg-zinc-700">
+          <Servers />
+
+          <div className="flex h-full min-w-[256px] max-w-[256px] flex-col justify-between bg-zinc-700">
             <div className="flex flex-col gap-4">
               <div className="flex h-12 w-full items-center border-b-[1px] border-zinc-800 px-6 font-semibold text-white">
                 {server?.data?.name}
@@ -112,7 +115,7 @@ const Server: NextPage = () => {
                 <div className="flex items-center">
                   <form className="flex w-full gap-4" onSubmit={handleSubmit}>
                     <input
-                      className="h-8 flex-1 rounded-full bg-zinc-600 px-4 text-white "
+                      className="h-8 w-full flex-1 rounded-full bg-zinc-600 px-4 text-white "
                       type="text"
                       placeholder="Channel name"
                       ref={channelRef}
@@ -134,9 +137,9 @@ const Server: NextPage = () => {
                       className={classnames(
                         "group flex items-center rounded-xl px-2",
                         {
-                          "bg-zinc-600 text-white":
+                          "bg-zinc-500 text-white":
                             activeChannel === channel.id,
-                          "text-white hover:bg-zinc-500":
+                          "text-white hover:bg-zinc-600":
                             activeChannel !== channel.id,
                         }
                       )}
@@ -196,7 +199,7 @@ const Server: NextPage = () => {
 
             <div
               ref={chatRef}
-              className="flex flex-1 flex-col-reverse overflow-x-auto px-4"
+              className="flex flex-1 flex-col-reverse overflow-y-auto px-4 scrollbar-default"
             >
               <ul className="flex flex-col gap-4 py-4">
                 {channel?.data?.messages.map((message) => (
@@ -233,7 +236,7 @@ const Server: NextPage = () => {
                 onSubmit={handleSendMessage}
               >
                 <input
-                  className="h-12 flex-1 rounded-xl bg-zinc-700 px-4 text-white placeholder:text-zinc-400"
+                  className="h-12 flex-1 rounded-xl bg-zinc-500 px-4 text-white placeholder:text-zinc-400"
                   type="text"
                   placeholder={`Message #${channel?.data?.name}`}
                   ref={messageRef}
